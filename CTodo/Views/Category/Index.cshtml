@@ -1,0 +1,35 @@
+@using Microsoft.IdentityModel.Tokens
+@model List<Ctodo.Models.Category>;
+
+<div>
+    <h2 class="text-center">Categories</h2>
+    <div class="mt-5">
+        <div class="d-flex justify-content-end">
+            <a href="/category/create" class="btn btn-outline-success">Create category</a>
+        </div>
+        <div class="mt-5">
+            @{
+                if (!Model.IsNullOrEmpty())
+                {
+                    foreach (var category in Model)
+                    {
+                        <div class="my-2 px-2 py-1 d-flex justify-content-between border border-1 border-secondary rounded">
+                            <div>
+                                @category.Name
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-danger">Delete</button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div>
+                        <h3 class="text-center">No categories created yet</h3>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
