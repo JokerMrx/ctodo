@@ -1,40 +1,36 @@
 using Ctodo.Data;
-using Ctodo.Models;
 using Ctodo.Models.ViewModel;
+using CTodo.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Utilities;
 
 namespace Ctodo.Controllers;
 
 public class TodoController : Controller
 {
     private readonly ILogger<TodoController> _logger;
-    private readonly ApplicationContext _applicationContext;
+    private readonly TodoService _todoService;
+    private readonly CategoryService _categoryService;
 
-    public TodoController(ILogger<TodoController> logger, ApplicationContext applicationContext)
+    public TodoController(ILogger<TodoController> logger, TodoService todoService, CategoryService categoryService)
     {
         _logger = logger;
-        _applicationContext = applicationContext;
+        _todoService = todoService;
+        _categoryService = categoryService;
     }
 
     [HttpGet]
     public ActionResult Index()
     {
-        var todosNotCompleted = _applicationContext.Todos.Where(t => t.IsCompleted == false).Include(t => t.Categories)
-            .AsEnumerable().OrderBy(t => t.Priority, new PriorityComparer()).ToList();
-        var todosCompleted = _applicationContext.Todos.Where(t => t.IsCompleted == true).Include(t => t.Categories)
-            .AsEnumerable().OrderBy(t => t.Priority, new PriorityComparer()).ToList();
-        
-        return View(new Tuple<List<Todo>, List<Todo>>(todosNotCompleted, todosCompleted));
-    }
+        var todos = _todoService.GetTodos();
+        var categories = _categoryService.GetCategories();
 
-    [HttpGet]
-    public IActionResult Create()
-    {
-        var categories = _applicationContext.Categories.ToList();
+        var todoIndex = new TodoIndexViewModel()
+        {
+            Todos = todos,
+            Categories = categories,
+        };
 
-        return View(new Tuple<List<Category>, TodoItemViewModel?>(categories, null));
+        return View(todoIndex);
     }
 
     [HttpPost]
@@ -42,29 +38,10 @@ public class TodoController : Controller
     {
         if (!ModelState.IsValid)
         {
-            var categories = _applicationContext.Categories.ToList();
-
-            return View(new Tuple<List<Category>, TodoItemViewModel>(categories, model));
+            return RedirectToActionPermanent("Index");
         }
 
-        string title = model.Title, priority = model.Priority;
-        var categoryId = model.Category;
-        var dueDate = model.DueDate;
-
-        var category =
-            await _applicationContext.Categories.FirstOrDefaultAsync(categor => categor.CategoryId == categoryId);
-
-        if (category == null)
-        {
-            ModelState.AddModelError("Category", "Such a category does not exist!");
-            return View();
-        }
-
-        var todo = new Todo()
-            { Title = title, Priority = priority, DueDate = dueDate, Categories = new List<Category>() { category } };
-
-        _applicationContext.Todos.Add(todo);
-        await _applicationContext.SaveChangesAsync();
+        await _todoService.CreateTodo(model);
 
         return RedirectToActionPermanent("Index");
     }
@@ -72,16 +49,15 @@ public class TodoController : Controller
     [HttpPost]
     public async Task<IActionResult> ToogleTodoCompleted(int TodoId, bool IsCompleted)
     {
-        Console.WriteLine(TodoId);
-        Console.WriteLine(IsCompleted);
-        var todo = await _applicationContext.Todos.FirstOrDefaultAsync(t => t.TodoId == TodoId);
+        await _todoService.ToogleCompleted(TodoId, IsCompleted);
 
-        if (todo == null) return NotFound();
-        Console.WriteLine(todo.Title);
-        todo.IsCompleted = IsCompleted;
-        _applicationContext.Update(todo);
+        return RedirectToAction("Index");
+    }
 
-        await _applicationContext.SaveChangesAsync();
+    [HttpPost]
+    public async Task<IActionResult> DeleteTodo(int TodoId)
+    {
+        await _todoService.DeleteTodoById(TodoId);
 
         return RedirectToAction("Index");
     }

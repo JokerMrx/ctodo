@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Ctodo.Data;
+using CTodo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<TodoService>();
 
 var app = builder.Build();
 
@@ -27,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Todo}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,45 +1,48 @@
 using Ctodo.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Ctodo.Data;
-using Ctodo.Models;
+using CTodo.Services;
 
 namespace Ctodo.Controllers;
 
 public class CategoryController : Controller
 {
     private readonly ILogger<CategoryController> _logger;
-    private readonly ApplicationContext _applicationContext;
+    private readonly CategoryService _categoryService;
 
-    public CategoryController(ILogger<CategoryController> logger, ApplicationContext applicationContext)
+    public CategoryController(ILogger<CategoryController> logger, CategoryService categoryService)
     {
         _logger = logger;
-        _applicationContext = applicationContext;
+        _categoryService = categoryService;
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        var categories = _applicationContext.Categories.ToList();
+        var categories = _categoryService.GetCategories();
 
-        return View(categories);
-    }
-
-    [HttpGet]
-    public IActionResult Create()
-    {
-        return View();
+        var categoryIndexViewModel = new CategoryIndexViewModel()
+        {
+            Categories = categories
+        };
+        
+        return View(categoryIndexViewModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CategoryViewModel model)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid) return RedirectToAction("Index");
 
-        var category = new Category() { Name = model.Name };
+        await _categoryService.CreateCategory(model);
 
-        _applicationContext.Categories.Add(category);
-        await _applicationContext.SaveChangesAsync();
+        return RedirectToAction("Index");
+    }
 
-        return RedirectToActionPermanent("Index", "Category");
+    [HttpPost]
+    public async Task<IActionResult> Delete(int categoryId)
+    {
+        await _categoryService.DeleteCategoryById(categoryId);
+        
+        return RedirectToAction("Index");
     }
 }
