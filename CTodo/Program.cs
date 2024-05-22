@@ -1,16 +1,16 @@
-using Microsoft.EntityFrameworkCore;
 using Ctodo.Data;
-using CTodo.Services;
+using CTodo.Repositories.Implementations;
+using CTodo.Repositories.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<ApplicationContext>(option =>
-    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<TodoService>();
+builder.Services.AddSingleton<DataContext>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
+builder.Services.AddScoped<ITodoRepository, TodoRepository>(); 
 
 var app = builder.Build();
 

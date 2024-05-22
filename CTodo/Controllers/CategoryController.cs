@@ -1,28 +1,26 @@
 using Ctodo.Models.ViewModel;
+using CTodo.Repositories.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using CTodo.Services;
 
 namespace Ctodo.Controllers;
 
 public class CategoryController : Controller
 {
-    private readonly ILogger<CategoryController> _logger;
-    private readonly CategoryService _categoryService;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CategoryController(ILogger<CategoryController> logger, CategoryService categoryService)
+    public CategoryController(ICategoryRepository categoryRepository)
     {
-        _logger = logger;
-        _categoryService = categoryService;
+        _categoryRepository = categoryRepository;
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var categories = _categoryService.GetCategories();
+        var categories = await _categoryRepository.Categories();
 
         var categoryIndexViewModel = new CategoryIndexViewModel()
         {
-            Categories = categories
+            Categories = categories.ToList()
         };
         
         return View(categoryIndexViewModel);
@@ -33,7 +31,7 @@ public class CategoryController : Controller
     {
         if (!ModelState.IsValid) return RedirectToAction("Index");
 
-        await _categoryService.CreateCategory(model);
+        await _categoryRepository.Create(model);
 
         return RedirectToAction("Index");
     }
@@ -41,7 +39,7 @@ public class CategoryController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(int categoryId)
     {
-        await _categoryService.DeleteCategoryById(categoryId);
+        await _categoryRepository.DeleteById(categoryId);
         
         return RedirectToAction("Index");
     }

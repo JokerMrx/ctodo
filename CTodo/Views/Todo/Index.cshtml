@@ -25,7 +25,7 @@
                                     <p class="card-text">Due Date: @todo.DueDate.Value.ToShortDateString()</p>
                                 }
                                 <div class="form-check">
-                                    <form id="formToogleTodoCompleted-@todo.TodoId" asp-action="ToogleTodoCompleted" asp-controller="Todo" method="post">
+                                    <form id="formToogleTodoCompleted-@todo.TodoId" asp-action="ToggleTodoCompleted" asp-controller="Todo" method="post">
                                         <input class="form-check-input" type="checkbox" id="todo-@todo.TodoId" name="IsCompleted" value="@((!todo.IsCompleted).ToString().ToLower())" checked="@(todo.IsCompleted)" onclick="handleToogleTodoCompleted(@todo.TodoId)"/>
                                         <input type="hidden" name="TodoId" value="@todo.TodoId"/>
                                     </form>

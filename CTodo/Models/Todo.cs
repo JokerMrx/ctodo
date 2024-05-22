@@ -9,5 +9,5 @@ public class Todo
     public bool IsCompleted { get; set; } = false;
     public DateTime? DueDate { get; set; }
     [MaxLength(50)] public string Priority { get; set; } = "Low";
-    public List<Category> Categories { get; set; }
+    public List<Category> Categories { get; set; } = new List<Category>();
 }

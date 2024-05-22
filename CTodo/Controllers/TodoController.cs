@@ -1,33 +1,30 @@
-using Ctodo.Data;
 using Ctodo.Models.ViewModel;
-using CTodo.Services;
+using CTodo.Repositories.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ctodo.Controllers;
 
 public class TodoController : Controller
 {
-    private readonly ILogger<TodoController> _logger;
-    private readonly TodoService _todoService;
-    private readonly CategoryService _categoryService;
+    private readonly ITodoRepository _todoRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public TodoController(ILogger<TodoController> logger, TodoService todoService, CategoryService categoryService)
+    public TodoController(ITodoRepository todoRepository, ICategoryRepository categoryRepository)
     {
-        _logger = logger;
-        _todoService = todoService;
-        _categoryService = categoryService;
+        _todoRepository = todoRepository;
+        _categoryRepository = categoryRepository;
     }
 
     [HttpGet]
-    public ActionResult Index()
+    public async Task<ActionResult> Index()
     {
-        var todos = _todoService.GetTodos();
-        var categories = _categoryService.GetCategories();
+        var todos = await _todoRepository.Todos();
+        var categories = await _categoryRepository.Categories();
 
         var todoIndex = new TodoIndexViewModel()
         {
-            Todos = todos,
-            Categories = categories,
+            Todos = todos.ToList(),
+            Categories = categories.ToList(),
         };
 
         return View(todoIndex);
@@ -41,15 +38,15 @@ public class TodoController : Controller
             return RedirectToActionPermanent("Index");
         }
 
-        await _todoService.CreateTodo(model);
+        await _todoRepository.Create(model);
 
         return RedirectToActionPermanent("Index");
     }
 
     [HttpPost]
-    public async Task<IActionResult> ToogleTodoCompleted(int TodoId, bool IsCompleted)
+    public async Task<IActionResult> ToggleTodoCompleted(int TodoId, bool IsCompleted)
     {
-        await _todoService.ToogleCompleted(TodoId, IsCompleted);
+        await _todoRepository.ToggleCompleted(TodoId, IsCompleted);
 
         return RedirectToAction("Index");
     }
@@ -57,7 +54,7 @@ public class TodoController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteTodo(int TodoId)
     {
-        await _todoService.DeleteTodoById(TodoId);
+        await _todoRepository.DeleteById(TodoId);
 
         return RedirectToAction("Index");
     }
