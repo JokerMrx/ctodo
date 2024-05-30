@@ -7,6 +7,6 @@ public interface ICategoryRepository
 {
     public Task<IEnumerable<Category>> Categories();
     public Task<Category> Create(CategoryViewModel categoryViewModel);
-    public Task<Category> GetById(int categoryId);
-    public Task<Category> DeleteById(int categoryId);
+    public Task<Category> GetById(Guid categoryId);
+    public Task<Category> DeleteById(Guid categoryId);
 }

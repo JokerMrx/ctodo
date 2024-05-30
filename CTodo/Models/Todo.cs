@@ -4,7 +4,7 @@ namespace Ctodo.Models;
 
 public class Todo
 {
-    [Key] public int TodoId { get; set; }
+    [Key] public Guid TodoId { get; set; }
     [Required] public string Title { get; set; }
     public bool IsCompleted { get; set; } = false;
     public DateTime? DueDate { get; set; }

@@ -4,6 +4,6 @@ namespace Ctodo.Models;
 
 public class Category
 {
-    [Key] public int CategoryId { get; set; }
-    [Required] public string Name { get; set; }
+    [Key] public Guid CategoryId { get; set; }
+    [Required] public string? Name { get; set; }
 }

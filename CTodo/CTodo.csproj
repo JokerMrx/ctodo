@@ -9,10 +9,11 @@
     <ItemGroup>
       <PackageReference Include="Dapper" Version="2.1.35" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+      <PackageReference Include="System.Xml.Linq" Version="3.5.21022.801" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Utilities\Utilities.csproj" />
+      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
     </ItemGroup>
 
 </Project>

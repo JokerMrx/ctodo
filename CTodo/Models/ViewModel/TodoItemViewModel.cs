@@ -6,8 +6,10 @@ public class TodoItemViewModel
 {
     [Required(ErrorMessage = "Title is required!")]
     public string Title { get; set; }
+
     [Required(ErrorMessage = "Category is required!")]
-    public int Category { get; set; }
+    public Guid Category { get; set; }
+
     public string Priority { get; set; }
     public DateTime? DueDate { get; set; }
 }

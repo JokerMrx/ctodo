@@ -1,16 +1,30 @@
 using Ctodo.Data;
-using CTodo.Repositories.Implementations;
+using CTodo.Factories;
+using CTodo.Options;
+using CTodo.Providers;
 using CTodo.Repositories.Infrastructure;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSingleton<DataContext>();
+builder.Services.Configure<XmlStorageOptions>(builder.Configuration.GetSection("XmlStorage"));
+builder.Services.AddTransient<StorageTypeProvider>();
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
-builder.Services.AddScoped<ITodoRepository, TodoRepository>(); 
+builder.Services.AddSingleton<IOptionsMonitor<StorageOptions>>(provider => new OptionsMonitor<StorageOptions>(
+    provider.GetRequiredService<IOptionsFactory<StorageOptions>>(),
+    provider.GetRequiredService<IEnumerable<IOptionsChangeTokenSource<StorageOptions>>>(),
+    provider.GetRequiredService<IOptionsMonitorCache<StorageOptions>>()));
+
+builder.Services.AddScoped<IRepositoryFactory, RepositoryFactory>();
+builder.Services.AddScoped<ICategoryRepository>(provider =>
+    provider.GetRequiredService<IRepositoryFactory>().CreateCategoryRepository());
+builder.Services.AddScoped<ITodoRepository>(provider =>
+    provider.GetRequiredService<IRepositoryFactory>().CreateTodoRepository());
 
 var app = builder.Build();
 

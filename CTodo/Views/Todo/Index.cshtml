@@ -8,7 +8,6 @@
 
 <div>
     @await Html.PartialAsync("Create", new Tuple<List<Category>, TodoItemViewModel>(@Model.Categories, Model.TodoItemViewModel))
-    <h2 class="my-2 text-center">Todo list</h2>
     <div class="mt-5 d-flex flex-column align-items-center">
         @{
             if (!Model.Todos.IsNullOrEmpty())
@@ -25,8 +24,8 @@
                                     <p class="card-text">Due Date: @todo.DueDate.Value.ToShortDateString()</p>
                                 }
                                 <div class="form-check">
-                                    <form id="formToogleTodoCompleted-@todo.TodoId" asp-action="ToggleTodoCompleted" asp-controller="Todo" method="post">
-                                        <input class="form-check-input" type="checkbox" id="todo-@todo.TodoId" name="IsCompleted" value="@((!todo.IsCompleted).ToString().ToLower())" checked="@(todo.IsCompleted)" onclick="handleToogleTodoCompleted(@todo.TodoId)"/>
+                                    <form id="formToggleTodoCompleted-@todo.TodoId" asp-action="ToggleTodoCompleted" asp-controller="Todo" method="post">
+                                        <input class="form-check-input" type="checkbox" id="todo-@todo.TodoId" name="IsCompleted" value="@((!todo.IsCompleted).ToString().ToLower())" checked="@(todo.IsCompleted)" onclick="handleToggleTodoCompleted('@todo.TodoId')"/>
                                         <input type="hidden" name="TodoId" value="@todo.TodoId"/>
                                     </form>
                                     <label class="form-check-label @(todo.IsCompleted ? "text-success" : "text-warning")" for="todo-@todo.TodoId">

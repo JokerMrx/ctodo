@@ -21,9 +21,9 @@ public class TodoRepository : ITodoRepository
     {
         const string query = """
                              SELECT * FROM Todos todo
-                             JOIN CategoryTodo ct ON todo.TodoId = ct.TodosTodoId
-                             JOIN Categories category ON ct.CategoriesCategoryId = category.CategoryId
-                             ORDER BY todo.IsCompleted DESC
+                             JOIN CategoryTodo ct ON todo.TodoId = ct.TodoId
+                             JOIN Categories category ON ct.CategoryId = category.CategoryId
+                             ORDER BY todo.IsCompleted
                              """;
 
         using var connection = _dataContext.CreateConnection();
@@ -36,7 +36,7 @@ public class TodoRepository : ITodoRepository
         return todos;
     }
 
-    public async Task<Todo> GetById(int todoId)
+    public async Task<Todo> GetById(Guid todoId)
     {
         const string query = """
                              SELECT * FROM Todos
@@ -59,17 +59,18 @@ public class TodoRepository : ITodoRepository
         var dueDate = todoItemViewModel.DueDate;
 
         const string query = """
-                             INSERT INTO Todos (Title, Priority, IsCompleted, DueDate)
-                             VALUES (@Title, @Priority, @IsCompleted, @DueDate)
-                             SELECT CAST(SCOPE_IDENTITY() as int)
+                             INSERT INTO Todos (TodoId, Title, Priority, IsCompleted, DueDate)
+                             OUTPUT INSERTED.TodoId
+                             VALUES (@TodoId, @Title, @Priority, @IsCompleted, @DueDate)
                              """;
 
         var category = await _categoryRepository.GetById(categoryId);
 
         using var connection = _dataContext.CreateConnection();
-        var todoId = await connection.ExecuteScalarAsync<int>(query,
+        var todoId = await connection.ExecuteScalarAsync<Guid>(query,
             new Todo()
             {
+                TodoId = Guid.NewGuid(),
                 Title = todoTitle, Priority = priority,
                 DueDate = dueDate
             });
@@ -77,11 +78,11 @@ public class TodoRepository : ITodoRepository
         if (category != null)
         {
             var linkQuery = """
-                            INSERT INTO CategoryTodo (TodosTodoId, CategoriesCategoryId)
-                            VALUES (@TodosTodoId, @CategoriesCategoryId);
+                            INSERT INTO CategoryTodo (TodoId, CategoryId)
+                            VALUES (@TodoId, @CategoryId);
                             """;
             await connection.ExecuteAsync(linkQuery,
-                new { TodosTodoId = todoId, CategoriesCategoryId = category.CategoryId });
+                new { TodoId = todoId, CategoryId = category.CategoryId });
         }
 
         var todo = await GetById(todoId);
@@ -89,7 +90,7 @@ public class TodoRepository : ITodoRepository
         return todo;
     }
 
-    public async Task<Todo> ToggleCompleted(int todoId, bool isCompleted)
+    public async Task<Todo> ToggleCompleted(Guid todoId, bool isCompleted)
     {
         const string query = """
                              UPDATE Todos SET IsCompleted = @IsCompleted
@@ -104,7 +105,7 @@ public class TodoRepository : ITodoRepository
         return todo;
     }
 
-    public async Task<Todo> DeleteById(int todoId)
+    public async Task<Todo> DeleteById(Guid todoId)
     {
         const string query = """
                              DELETE FROM Todos
@@ -112,7 +113,13 @@ public class TodoRepository : ITodoRepository
                              WHERE TodoId = @todoId
                              """;
 
+        const string queryCategoryTodo = """
+                                         DELETE FROM CategoryTodo
+                                         WHERE TodoId = @todoId
+                                         """;
+
         using var connection = _dataContext.CreateConnection();
+        await connection.ExecuteAsync(queryCategoryTodo, new { todoId });
         var todo = await connection.QuerySingleOrDefaultAsync<Todo>(query, new { todoId });
 
         if (todo == null) throw new Exception("This todo does not exist!");

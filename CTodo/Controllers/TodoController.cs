@@ -1,6 +1,8 @@
 using Ctodo.Models.ViewModel;
+using CTodo.Options;
 using CTodo.Repositories.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Ctodo.Controllers;
 
@@ -8,11 +10,14 @@ public class TodoController : Controller
 {
     private readonly ITodoRepository _todoRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IOptionsMonitor<StorageOptions> _storageOptions;
 
-    public TodoController(ITodoRepository todoRepository, ICategoryRepository categoryRepository)
+    public TodoController(ITodoRepository todoRepository, ICategoryRepository categoryRepository,
+        IOptionsMonitor<StorageOptions> storageOptions)
     {
         _todoRepository = todoRepository;
         _categoryRepository = categoryRepository;
+        _storageOptions = storageOptions;
     }
 
     [HttpGet]
@@ -20,6 +25,8 @@ public class TodoController : Controller
     {
         var todos = await _todoRepository.Todos();
         var categories = await _categoryRepository.Categories();
+        var storageOptions = _storageOptions.CurrentValue;
+        ViewBag.CurrentStorageType = storageOptions.StorageType;
 
         var todoIndex = new TodoIndexViewModel()
         {
@@ -44,7 +51,7 @@ public class TodoController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> ToggleTodoCompleted(int TodoId, bool IsCompleted)
+    public async Task<IActionResult> ToggleTodoCompleted(Guid TodoId, bool IsCompleted)
     {
         await _todoRepository.ToggleCompleted(TodoId, IsCompleted);
 
@@ -52,7 +59,7 @@ public class TodoController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteTodo(int TodoId)
+    public async Task<IActionResult> DeleteTodo(Guid TodoId)
     {
         await _todoRepository.DeleteById(TodoId);
 

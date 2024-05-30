@@ -32,19 +32,21 @@ public class CategoryRepository : ICategoryRepository
         var categoryName = categoryViewModel.Name;
 
         const string query = """
-                             INSERT INTO Categories (Name)
-                             VALUES (@Name)
-                             SELECT CAST(SCOPE_IDENTITY() as int)
+                             INSERT INTO Categories (CategoryId, Name)
+                             OUTPUT INSERTED.CategoryId
+                             VALUES (@CategoryId, @Name)
                              """;
 
         using var connection = _dataContext.CreateConnection();
-        var categoryId = await connection.ExecuteScalarAsync<int>(query, new Category() { Name = categoryName });
+        var categoryId = await connection.ExecuteScalarAsync<Guid>(query,
+            new Category() { CategoryId = Guid.NewGuid(), Name = categoryName });
+
         var category = await GetById(categoryId);
 
         return category;
     }
 
-    public async Task<Category> GetById(int categoryId)
+    public async Task<Category> GetById(Guid categoryId)
     {
         const string query = """
                              SELECT * FROM Categories
@@ -59,7 +61,7 @@ public class CategoryRepository : ICategoryRepository
         return category;
     }
 
-    public async Task<Category> DeleteById(int categoryId)
+    public async Task<Category> DeleteById(Guid categoryId)
     {
         const string query = """
                              DELETE FROM Categories
