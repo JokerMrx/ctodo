@@ -39,12 +39,29 @@ public class TodoRepository : ITodoRepository
     public async Task<Todo> GetById(Guid todoId)
     {
         const string query = """
-                             SELECT * FROM Todos
-                             WHERE TodoId = (@todoId)
+                             SELECT todo.*, category.CategoryId, category.Name
+                             FROM Todos todo
+                             JOIN CategoryTodo ct ON todo.TodoId = ct.TodoId
+                             JOIN Categories category ON ct.CategoryId = category.CategoryId
+                             WHERE todo.TodoId = @todoId
                              """;
 
         using var connection = _dataContext.CreateConnection();
-        var todo = await connection.QueryFirstOrDefaultAsync<Todo>(query, new { todoId });
+        var todoDictionary = new Dictionary<Guid, Todo>();
+        await connection.QueryAsync<Todo, Category, Todo>(query, (todo, category) =>
+        {
+            if (!todoDictionary.TryGetValue(todo.TodoId, out var currentTodo))
+            {
+                currentTodo = todo;
+                todoDictionary.Add(currentTodo.TodoId, currentTodo);
+            }
+
+            currentTodo.Categories.Add(category);
+
+            return currentTodo;
+        }, new { todoId }, splitOn: "CategoryId");
+
+        var todo = todoDictionary.Values.FirstOrDefault();
 
         if (todo == null) throw new Exception("This todo does not exist!");
 

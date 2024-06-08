@@ -1,8 +1,14 @@
 using Ctodo.Data;
 using CTodo.Factories;
+using CTodo.GraphQL.GraphQLMutations;
+using CTodo.GraphQL.GraphQLQueries;
+using CTodo.GraphQL.GraphQLSchema;
+using CTodo.GraphQL.GraphQLTypes;
 using CTodo.Options;
 using CTodo.Providers;
 using CTodo.Repositories.Infrastructure;
+using GraphQL;
+using GraphQL.Types;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +20,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<DataContext>();
 builder.Services.Configure<XmlStorageOptions>(builder.Configuration.GetSection("XmlStorage"));
 builder.Services.AddTransient<StorageTypeProvider>();
+builder.Services.Configure<IISServerOptions>(options => { options.AllowSynchronousIO = true; });
 
 builder.Services.AddSingleton<IOptionsMonitor<StorageOptions>>(provider => new OptionsMonitor<StorageOptions>(
     provider.GetRequiredService<IOptionsFactory<StorageOptions>>(),
@@ -25,6 +32,21 @@ builder.Services.AddScoped<ICategoryRepository>(provider =>
     provider.GetRequiredService<IRepositoryFactory>().CreateCategoryRepository());
 builder.Services.AddScoped<ITodoRepository>(provider =>
     provider.GetRequiredService<IRepositoryFactory>().CreateTodoRepository());
+
+builder.Services.AddScoped<TodoMutation>();
+builder.Services.AddScoped<TodoQuery>();
+builder.Services.AddScoped<TodoType>();
+builder.Services.AddScoped<CategoryQuery>();
+builder.Services.AddScoped<CategoryType>();
+
+builder.Services.AddScoped<ISchema, AppSchema>();
+
+builder.Services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+builder.Services.AddGraphQL(b => b
+    .AddSystemTextJson()
+    .AddGraphTypes(typeof(AppSchema).Assembly)
+    .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = builder.Environment.IsDevelopment())
+);
 
 var app = builder.Build();
 
@@ -42,6 +64,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseGraphQL<ISchema>("/graphql");
+app.UseGraphQLPlayground();
 
 app.MapControllerRoute(
     name: "default",
