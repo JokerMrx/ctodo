@@ -95,11 +95,11 @@ public class TodoRepository : ITodoRepository
         if (category != null)
         {
             var linkQuery = """
-                            INSERT INTO CategoryTodo (TodoId, CategoryId)
-                            VALUES (@TodoId, @CategoryId);
+                            INSERT INTO CategoryTodo (Id, TodoId, CategoryId)
+                            VALUES (@Id, @TodoId, @CategoryId);
                             """;
             await connection.ExecuteAsync(linkQuery,
-                new { TodoId = todoId, CategoryId = category.CategoryId });
+                new { Id = Guid.NewGuid(), TodoId = todoId, CategoryId = category.CategoryId });
         }
 
         var todo = await GetById(todoId);

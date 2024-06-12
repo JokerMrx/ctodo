@@ -4,6 +4,7 @@ using CTodo.GraphQL.GraphQLMutations;
 using CTodo.GraphQL.GraphQLQueries;
 using CTodo.GraphQL.GraphQLSchema;
 using CTodo.GraphQL.GraphQLTypes;
+using CTodo.Middlewares;
 using CTodo.Options;
 using CTodo.Providers;
 using CTodo.Repositories.Infrastructure;
@@ -62,6 +63,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseMiddleware<StorageTypeMiddleware>();
 
 app.UseAuthorization();
 

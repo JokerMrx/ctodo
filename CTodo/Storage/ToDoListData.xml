@@ -9,6 +9,10 @@
       <CategoryId>5826361d-00dc-48bf-8c49-c9ae381a92ed</CategoryId>
       <Name>test</Name>
     </Category>
+    <Category>
+      <CategoryId>308bb9ea-d4c1-43da-9129-d01f43a60698</CategoryId>
+      <Name>xml</Name>
+    </Category>
   </Categories>
   <Todos>
     <Todo>
@@ -53,6 +57,17 @@
       <Category>
         <CategoryId>5969de5f-06b3-43f6-80a1-56737e5be1f2</CategoryId>
         <Name>guid</Name>
+      </Category>
+    </Todo>
+    <Todo>
+      <TodoId>71038bbe-142b-4bcb-af3b-4b818ce4738d</TodoId>
+      <Title>xml</Title>
+      <Priority>High</Priority>
+      <IsCompleted>True</IsCompleted>
+      <DueDate>2024-06-07T00:00:00Z</DueDate>
+      <Category>
+        <CategoryId>308bb9ea-d4c1-43da-9129-d01f43a60698</CategoryId>
+        <Name>xml</Name>
       </Category>
     </Todo>
   </Todos>

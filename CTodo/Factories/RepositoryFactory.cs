@@ -9,16 +9,32 @@ public class RepositoryFactory : IRepositoryFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IOptionsMonitor<StorageOptions> _storageOptions;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public RepositoryFactory(IServiceProvider serviceProvider, IOptionsMonitor<StorageOptions> storageOptions)
+    public RepositoryFactory(IServiceProvider serviceProvider, IOptionsMonitor<StorageOptions> storageOptions,
+        IHttpContextAccessor httpContextAccessor)
     {
         _serviceProvider = serviceProvider;
         _storageOptions = storageOptions;
+        _httpContextAccessor = httpContextAccessor;
     }
+
+    private string GetStorageType()
+    {
+        var context = _httpContextAccessor.HttpContext;
+
+        if (context != null && context.Request.Headers.TryGetValue("Database-type", out var storageType))
+        {
+            return storageType.ToString().ToLower();
+        }
+
+        return _storageOptions.CurrentValue.StorageType?.ToLower() ?? "database";
+    }
+
 
     public ICategoryRepository CreateCategoryRepository()
     {
-        var storageType = _storageOptions.CurrentValue.StorageType ?? "Database";
+        var storageType = GetStorageType();
 
         switch (storageType.ToLower())
         {
@@ -33,7 +49,7 @@ public class RepositoryFactory : IRepositoryFactory
 
     public ITodoRepository CreateTodoRepository()
     {
-        var storageType = _storageOptions.CurrentValue.StorageType ?? "Database";
+        var storageType = GetStorageType();
 
         switch (storageType.ToLower())
         {
