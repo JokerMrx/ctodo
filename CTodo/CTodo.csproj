@@ -21,4 +21,10 @@
       <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="src\components\cards\categories\" />
+      <Folder Include="src\components\ui\buttons\" />
+      <Folder Include="src\components\ui\fields\" />
+    </ItemGroup>
+
 </Project>

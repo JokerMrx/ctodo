@@ -1,0 +1,18 @@
+[
+  {
+    "CategoryId": "b7b98d0c-66f8-46ee-9f85-cd886fbc88eb",
+    "Name": "Job"
+  },
+  {
+    "CategoryId": "04e1b54a-a21f-4733-a2b8-5537276c0b60",
+    "Name": "Study"
+  },
+  {
+    "CategoryId": "1b1de77c-2439-4a0f-852d-1ecde075095d",
+    "Name": "Home"
+  },
+  {
+    "CategoryId": "ad69aae5-6c9b-4320-b7bd-d6b63cc042ac",
+    "Name": "Other"
+  }
+]
