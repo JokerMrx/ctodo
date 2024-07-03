@@ -1,15 +1,19 @@
 import {Provider} from "react-redux";
+import {RouterProvider} from "react-router-dom";
 
-import HomeView from "./views/home/home-view.tsx";
+import ApolloAppProvider from "./providers/apollo-provider.tsx";
+import {router} from "./components/router/router.tsx";
 import store from "./store/store.ts";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
     return (
-        <Provider store={store}>
-            <HomeView/>
-        </Provider>
+        <ApolloAppProvider>
+            <Provider store={store}>
+                <RouterProvider router={router}/>
+            </Provider>
+        </ApolloAppProvider>
     )
 }
 

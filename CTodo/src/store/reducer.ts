@@ -1,50 +1,23 @@
 import {IState, IAction} from '../interfaces/store.ts';
-import {isTodoStatusUpdate, isValidateTodo} from "../utils/validate.ts";
+import {ITodo} from "../interfaces/ITodo.ts";
+import {ICategory} from "../interfaces/ICategory.ts";
 
 const initialState: IState = {
     todos: [],
+    categories: [],
 };
 
 const reducer = (state: IState = initialState, action: IAction): IState => {
         switch (action.type) {
-            case "NEW_TODO": {
-                const todo = action.payload;
-                if (isValidateTodo(todo)) {
-                    return {
-                        ...state,
-                        todos: [...state.todos, todo],
-                    };
-                }
+            case "SET_TODOS": {
+                const todos: ITodo[] = action.payload as ITodo[];
 
-                return state;
-            }
-            case
-            "TOGGLE_COMPLETED_TODO"
-            : {
-                if(!isTodoStatusUpdate(action.payload)) return state;
-                
-                const {todoId, isCompleted}= action.payload;
-                const todos = state.todos.map(todo => {
-                    if(todo.TodoId === todoId){
-                        todo.IsCompleted = isCompleted;
-                        return todo;
-                    }
-                    
-                    return todo;
-                })
-
-                return {
-                    ...state,
-                    todos,
-                };
-            }
-            case
-            "DELETE_TODO"
-            : {
-                const todoId = action.payload;
-                const todos = state.todos.filter(todo => todo.TodoId !== todoId);
-                
                 return {...state, todos};
+            }
+            case "SET_CATEGORIES": {
+                const categories: ICategory[] = action.payload as ICategory[];
+
+                return {...state, categories};
             }
             default:
                 return state;

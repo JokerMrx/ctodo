@@ -16,17 +16,6 @@
   </Categories>
   <Todos>
     <Todo>
-      <TodoId>b98f2fc7-906f-43a8-b6f3-34017d92151d</TodoId>
-      <Title>test</Title>
-      <Priority>Low</Priority>
-      <IsCompleted>False</IsCompleted>
-      <DueDate />
-      <Category>
-        <CategoryId>5969de5f-06b3-43f6-80a1-56737e5be1f2</CategoryId>
-        <Name>guid</Name>
-      </Category>
-    </Todo>
-    <Todo>
       <TodoId>b44b3f07-11c2-4205-8284-936ff719f402</TodoId>
       <Title>dueDate</Title>
       <Priority>Medium</Priority>

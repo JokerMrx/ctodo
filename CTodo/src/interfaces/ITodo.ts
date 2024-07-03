@@ -3,10 +3,14 @@ import {PriorityEnum} from "../enums/PriorityEnum.ts";
 import {ICategory} from "./ICategory.ts";
 
 export interface ITodo {
-    TodoId: IId,
-    Title: string,
-    IsCompleted: boolean,
-    Priority: PriorityEnum,
-    DueDate: Date | null,
-    Categories: ICategory[]
+    todoId: IId,
+    title: string,
+    isCompleted: boolean,
+    priority: PriorityEnum,
+    dueDate: Date | null,
+    categories: ICategory[]
 }
+
+export type ITodoCreate = Pick<ITodo, "title" | "priority" | "dueDate"> & {
+    category: IId
+};

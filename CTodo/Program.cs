@@ -14,6 +14,17 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        b =>
+        {
+            b.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
@@ -65,6 +76,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseMiddleware<StorageTypeMiddleware>();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthorization();
 

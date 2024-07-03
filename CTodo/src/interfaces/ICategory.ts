@@ -1,6 +1,8 @@
 import {IId} from "./IId.ts";
 
 export interface ICategory {
-    CategoryId: IId,
-    Name: string
+    categoryId: IId,
+    name: string
 }
+
+export type ICategoryCreate = Pick<ICategory, "name">;

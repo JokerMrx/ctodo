@@ -15,7 +15,7 @@ public class TodoMutation : ObjectGraphType
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "title" },
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "priority" },
                 new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "category" },
-                new QueryArgument<NonNullGraphType<DateGraphType>> { Name = "dueDate" }
+                new QueryArgument<DateTimeGraphType> { Name = "dueDate" }
             ))
             .ResolveAsync(async context =>
                 {

@@ -1,4 +1,18 @@
+import {ChangeEvent} from "react";
+import {Link} from "react-router-dom";
+
+import {DATA_STORAGE_TYPE_KEY} from "../../constants";
+import {DataStorageTypeEnum} from "../../enums/DataStorageTypeEnum.ts";
+
 const Navbar = () => {
+    const currentDataStorageType = localStorage.getItem(DATA_STORAGE_TYPE_KEY) ?? DataStorageTypeEnum.DATABASE;
+
+    const handleChangeDataStorageType = (e: ChangeEvent<HTMLSelectElement>) => {
+        const {value} = e.target;
+
+        localStorage.setItem(DATA_STORAGE_TYPE_KEY, value);
+    }
+
     return <header className="w-100">
         <nav
             className="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -12,21 +26,25 @@ const Navbar = () => {
                 <div className="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul className="navbar-nav flex-grow-1">
                         <li className="nav-item">
-                            <a className="nav-link text-dark" href="#">Home</a>
+                            <Link className="nav-link text-dark" to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link text-dark" href="#">{"Todo"}</a>
+                            <Link className="nav-link text-dark" to="/">{"Todo"}</Link>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link text-dark" href="#">Category</a>
+                            <Link className="nav-link text-dark" to="/categories">Category</Link>
                         </li>
                     </ul>
                 </div>
                 <div className="d-flex gap-4">
                     <div>
-                        <select className="form-select" name="StorageType" id="Storage">
-                            <option value="database">Database</option>
-                            <option value="xml">Xml File</option>
+                        <select className="form-select" onChange={handleChangeDataStorageType}>
+                            <option value="database"
+                                    selected={currentDataStorageType === DataStorageTypeEnum.DATABASE}>Database
+                            </option>
+                            <option value="xml" selected={currentDataStorageType === DataStorageTypeEnum.XML}>Xml
+                                File
+                            </option>
                         </select>
                     </div>
                     <div>
